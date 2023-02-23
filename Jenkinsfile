@@ -81,15 +81,16 @@ pipeline {
 
                 echo 'Snyk Container Test using Snyk CLI'
                 // Use your own Snyk Organization with --org=<your-org>
-                sh 'docker run --env ${SNYK_TOKEN} -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container test --print-deps --org=demo_high --app-vulns --nested-jars=8 lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest || true'
+                sh 'docker run --env SNYK_TOKEN=${SNYK_TOKEN} -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container test --print-deps --org=demo_high --app-vulns --nested-jars=8 lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest || true'
         
                 // Capture the dependency tree for ongoing monitoring in Snyk.
                 // This is typically done after deployment to some environment
                 echo 'Snyk Container Monitor using Snyk CLI'
-                sh 'docker run --env ${SNYK_TOKEN} -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container monitor --print-deps --org=demo_high --app-vulns --nested-jars=8 lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest'
+                sh 'docker run --env SNYK_TOKEN=${SNYK_TOKEN} -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk:docker snyk container monitor --print-deps --org=demo_high --app-vulns --nested-jars=8 lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest'
         
                 echo 'Push container image'
-                sh "docker push lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest"
+                sh 'docker login -u lucmaeda -p ${DOCKER_TOKEN}'
+                sh 'docker push lucmaeda/my-snyk-demo-mvn-goof-jenkins:latest'
             }
         }
         
